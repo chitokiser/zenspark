@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Zen Spark Gallery 서비스 — 체험, 쇼핑, 숙박, 교통 예약">
+  <title>서비스 — Zen Spark Gallery</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Noto+Serif+KR:wght@300;400;500&family=Noto+Sans+KR:wght@300;400;500&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="icon" type="image/png" href="images/logo/fabicon.png">
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
+</head>
+<body>
+
+<div id="page-overlay"></div>
+<div id="scroll-progress"></div>
+
+<!-- HEADER -->
+<header id="site-header">
+  <div class="container">
+    <div class="header-inner">
+      <a href="index.html" class="header-logo">
+        <img src="images/logo/logo.png"    class="header-logo__img header-logo__img--light" alt="Zen Spark Gallery">
+        <img src="images/logo/fabicon.png" class="header-logo__img header-logo__img--dark"  alt="Zen Spark Gallery">
+      </a>
+      <nav class="header-nav">
+        <a href="index.html#about"  data-i18n="nav_intro">소개</a>
+        <a href="community.html"    data-i18n="nav_community">커뮤니티</a>
+        <a href="services.html" class="active" data-i18n="nav_services">서비스</a>
+      </nav>
+      <div class="header-actions">
+        <div class="lang-toggle">
+          <button class="lang-btn active" data-lang="ko">KR</button>
+          <button class="lang-btn"        data-lang="en">EN</button>
+        </div>
+        <button id="header-login-btn" class="header-login-btn" data-i18n="btn_login">로그인</button>
+        <div id="header-user-menu" class="user-menu" style="display:none;">
+          <div id="header-avatar" class="user-menu__avatar"></div>
+          <div class="user-menu__dropdown">
+            <span id="header-username" style="display:block;padding:0.6rem 1.25rem;font-size:0.72rem;color:var(--gray-4);border-bottom:1px solid var(--gray-6);"></span>
+            <a href="https://jump22.netlify.app/mypage" target="_blank" data-i18n="btn_mypage">마이페이지</a>
+            <div class="divider"></div>
+            <button id="header-logout-btn" class="logout-btn" data-i18n="btn_logout">로그아웃</button>
+          </div>
+        </div>
+        <button id="hamburger" class="hamburger" aria-label="Menu">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+    </div>
+  </div>
+</header>
+
+<nav id="mobile-nav" class="mobile-nav">
+  <a href="index.html#about"  data-i18n="nav_intro">소개</a>
+  <a href="community.html"    data-i18n="nav_community">커뮤니티</a>
+  <a href="services.html"     data-i18n="nav_services">서비스</a>
+  <div style="display:flex;gap:1rem;margin-top:2rem;">
+    <button class="lang-btn" data-lang="ko" style="font-size:0.85rem;padding:0.4rem 1rem;border:1px solid var(--gray-5);border-radius:20px;">KR</button>
+    <button class="lang-btn" data-lang="en" style="font-size:0.85rem;padding:0.4rem 1rem;border:1px solid var(--gray-5);border-radius:20px;">EN</button>
+  </div>
+</nav>
+
+<!-- PAGE HERO -->
+<section class="page-hero">
+  <div class="container">
+    <p class="label" data-i18n="svc_label">서비스</p>
+    <h1 data-i18n="svc_title">체험 & 커머스</h1>
+    <p data-i18n="svc_desc">마음을 깨우는 다양한 체험과 상품을 만나보세요.</p>
+  </div>
+</section>
+
+<!-- SERVICES GRID -->
+<section class="section">
+  <div class="container">
+
+    <!-- Feature highlight (My Page + Yen Tu Taxi — live links) -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--spacing-lg);margin-bottom:var(--spacing-xl);" class="fade-in">
+      <!-- My Page -->
+      <a href="https://jump22.netlify.app/mypage" target="_blank"
+         class="service-card" style="display:flex;flex-direction:row;align-items:center;gap:0;padding:0;overflow:hidden;">
+        <div style="width:6px;background:var(--gold);align-self:stretch;flex-shrink:0;"></div>
+        <div style="padding:2rem;">
+          <div style="font-size:2rem;margin-bottom:0.75rem;">👤</div>
+          <h3 class="service-card__title" data-i18n="svc_mypage">마이 페이지</h3>
+          <p class="service-card__desc" data-i18n="svc_mypage_desc">나의 예약, 구매 내역, 프로필을 관리합니다.</p>
+          <div class="service-card__link" data-i18n="svc_visit">바로가기 →</div>
+        </div>
+      </a>
+      <!-- Yen Tu Taxi -->
+      <a href="https://jump22.netlify.app/buggy" target="_blank"
+         class="service-card" style="display:flex;flex-direction:row;align-items:center;gap:0;padding:0;overflow:hidden;">
+        <div style="width:6px;background:var(--gold);align-self:stretch;flex-shrink:0;"></div>
+        <div style="padding:2rem;">
+          <div style="font-size:2rem;margin-bottom:0.75rem;">🚗</div>
+          <h3 class="service-card__title" data-i18n="svc_taxi">Yen Tu Taxi</h3>
+          <p class="service-card__desc" data-i18n="svc_taxi_desc">옌뚜 셔틀 버기 예약 서비스입니다.</p>
+          <div class="service-card__link" data-i18n="svc_visit">바로가기 →</div>
+        </div>
+      </a>
+    </div>
+
+    <span class="gold-rule gold-rule--lg fade-in"></span>
+
+    <!-- Other services (Coming soon) -->
+    <div style="margin-top:var(--spacing-xl);">
+      <div class="section-header fade-in" style="margin-bottom:var(--spacing-lg);text-align:left;">
+        <span class="label" style="display:inline-block;">준비 중인 서비스</span>
+      </div>
+      <div class="services-grid">
+
+        <div class="service-card fade-in fade-in-delay-1">
+          <div class="service-card__icon">🌿</div>
+          <div class="service-card__body">
+            <h3 class="service-card__title" data-i18n="svc_organic">Zen 유기농 꾸러미</h3>
+            <p class="service-card__desc" data-i18n="svc_organic_desc">자연에서 온 유기농 제품들을 경험해 보세요.</p>
+          </div>
+          <span class="service-card__badge" data-i18n="svc_coming_soon">준비 중</span>
+        </div>
+
+        <div class="service-card fade-in fade-in-delay-2">
+          <div class="service-card__icon">🛍</div>
+          <div class="service-card__body">
+            <h3 class="service-card__title" data-i18n="svc_mall">Zen Mall</h3>
+            <p class="service-card__desc" data-i18n="svc_mall_desc">선 철학이 담긴 예술품과 생활용품을 만나보세요.</p>
+          </div>
+          <span class="service-card__badge" data-i18n="svc_coming_soon">준비 중</span>
+        </div>
+
+        <div class="service-card fade-in fade-in-delay-3">
+          <div class="service-card__icon">🎁</div>
+          <div class="service-card__body">
+            <h3 class="service-card__title" data-i18n="svc_voucher">Zen Voucher</h3>
+            <p class="service-card__desc" data-i18n="svc_voucher_desc">특별한 체험을 선물로 드려보세요.</p>
+          </div>
+          <span class="service-card__badge" data-i18n="svc_coming_soon">준비 중</span>
+        </div>
+
+        <div class="service-card fade-in fade-in-delay-4">
+          <div class="service-card__icon">🏯</div>
+          <div class="service-card__body">
+            <h3 class="service-card__title" data-i18n="svc_hotel">Zen Spark Hotel</h3>
+            <p class="service-card__desc" data-i18n="svc_hotel_desc">자연 속 고요한 숙박 체험을 즐기세요.</p>
+          </div>
+          <span class="service-card__badge" data-i18n="svc_coming_soon">준비 중</span>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- CTA Banner -->
+    <div class="fade-in" style="margin-top:var(--spacing-xxl);background:var(--black);border-radius:var(--radius-md);padding:4rem;text-align:center;position:relative;overflow:hidden;">
+      <div style="position:absolute;inset:0;background:radial-gradient(ellipse 60% 70% at 50% 50%,rgba(201,168,76,0.08) 0%,transparent 70%);pointer-events:none;"></div>
+      <p style="font-size:0.7rem;letter-spacing:0.28em;text-transform:uppercase;color:var(--gold);margin-bottom:1rem;">Zen Spark Gallery</p>
+      <h2 style="font-family:var(--ff-display);font-size:clamp(1.8rem,3vw,2.8rem);font-weight:300;color:var(--white);margin-bottom:1rem;">
+        지금 커뮤니티에 참여하세요
+      </h2>
+      <p style="color:rgba(250,250,248,0.5);margin-bottom:2rem;font-size:0.95rem;">방문 후기와 이야기를 나누고 최신 소식을 받아보세요.</p>
+      <a href="community.html" class="btn btn--gold" data-i18n="nav_community">커뮤니티 바로가기</a>
+    </div>
+
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer id="site-footer">
+  <div class="container">
+    <div class="footer-inner">
+      <div class="footer-brand">
+        <img src="images/logo/fabicon.png" alt="Zen Spark Gallery" class="footer-logo__img">
+        <p>선불교(禪)의 정신을 바탕으로 예술, 체험, 커머스가 하나로 어우러지는 공간입니다.</p>
+        <span class="footer-tagline" data-i18n="footer_tagline">A space for awakening, art, and mindful living</span>
+      </div>
+      <div class="footer-col">
+        <h5 data-i18n="footer_links">바로가기</h5>
+        <ul>
+          <li><a href="index.html" data-i18n="nav_intro">소개</a></li>
+          <li><a href="community.html" data-i18n="nav_community">커뮤니티</a></li>
+          <li><a href="services.html" data-i18n="nav_services">서비스</a></li>
+          <li><a href="https://jump22.netlify.app/mypage" target="_blank" data-i18n="btn_mypage">마이페이지</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h5 data-i18n="footer_contact">연락처</h5>
+        <ul>
+          <li><a href="mailto:info@zenspark.gallery">info@zenspark.gallery</a></li>
+          <li><a href="https://tracer543.wixsite.com/my-site" target="_blank">Wix Blog</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p data-i18n="footer_copy">© 2024 Zen Spark Gallery. All rights reserved.</p>
+      <div class="lang-toggle">
+        <button class="lang-btn active" data-lang="ko">KR</button>
+        <button class="lang-btn"        data-lang="en">EN</button>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<button id="back-to-top" aria-label="Back to top">↑</button>
+<div id="toast-container"></div>
+
+<!-- LOGIN MODAL -->
+<div id="login-modal" class="modal-overlay">
+  <div class="modal">
+    <button id="modal-close-btn" class="modal__close" aria-label="Close">✕</button>
+    <h2 class="modal__title" data-i18n="login_title">로그인</h2>
+    <p class="modal__subtitle" data-i18n="login_subtitle">로그인하여 커뮤니티에 참여하세요.</p>
+    <span class="gold-rule"></span>
+    <button id="google-login-btn" class="login-btn login-btn--google">
+      <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+        <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+        <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+        <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
+        <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+      </svg>
+      <span data-i18n="login_google">Google로 계속하기</span>
+    </button>
+    <div class="login-divider"><span data-i18n="login_or">또는</span></div>
+    <form id="jump-login-form">
+      <div class="form-group">
+        <label for="jump-id" data-i18n="login_id">아이디</label>
+        <input type="text" id="jump-id" class="form-control" placeholder="아이디" autocomplete="username">
+      </div>
+      <div class="form-group">
+        <label for="jump-pw" data-i18n="login_pw">비밀번호</label>
+        <input type="password" id="jump-pw" class="form-control" placeholder="비밀번호" autocomplete="current-password">
+      </div>
+      <button type="submit" class="login-btn login-btn--jump">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/>
+        </svg>
+        <span data-i18n="login_jump">Jump ID로 로그인</span>
+      </button>
+    </form>
+
+    <p class="modal__register">
+      <span data-i18n="login_no_account">계정이 없으신가요?</span>
+      <a href="https://jump22.netlify.app/register" target="_blank" rel="noopener" data-i18n="login_register">회원가입</a>
+    </p>
+  </div>
+</div>
+
+<script src="js/language.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/header.js"></script>
+<script src="js/main.js"></script>
+</body>
+</html>
