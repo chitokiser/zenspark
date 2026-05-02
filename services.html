@@ -79,8 +79,8 @@
 <section class="section">
   <div class="container">
 
-    <!-- Feature highlight (My Page + Yen Tu Taxi — live links) -->
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--spacing-lg);margin-bottom:var(--spacing-xl);" class="fade-in">
+    <!-- Feature highlight (My Page + Yen Tu Taxi + 보물찾기 — live links) -->
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:var(--spacing-lg);margin-bottom:var(--spacing-xl);" class="fade-in svc-feature-grid">
       <!-- My Page -->
       <a href="https://jump22.netlify.app/mypage" target="_blank"
          class="service-card" style="display:flex;flex-direction:row;align-items:center;gap:0;padding:0;overflow:hidden;">
@@ -100,6 +100,17 @@
           <div style="font-size:2rem;margin-bottom:0.75rem;">🚗</div>
           <h3 class="service-card__title" data-i18n="svc_taxi">Yen Tu Taxi</h3>
           <p class="service-card__desc" data-i18n="svc_taxi_desc">옌뚜 셔틀 버기 예약 서비스입니다.</p>
+          <div class="service-card__link" data-i18n="svc_visit">바로가기 →</div>
+        </div>
+      </a>
+      <!-- 보물찾기 -->
+      <a href="https://jump22.netlify.app/merchants" target="_blank"
+         class="service-card" style="display:flex;flex-direction:row;align-items:center;gap:0;padding:0;overflow:hidden;">
+        <div style="width:6px;background:var(--gold);align-self:stretch;flex-shrink:0;"></div>
+        <div style="padding:2rem;">
+          <div style="font-size:2rem;margin-bottom:0.75rem;">🗺️</div>
+          <h3 class="service-card__title" data-i18n="svc_treasure">보물찾기</h3>
+          <p class="service-card__desc" data-i18n="svc_treasure_desc">옌뚜 지역 가맹점 지도에서 보물을 찾아보세요.</p>
           <div class="service-card__link" data-i18n="svc_visit">바로가기 →</div>
         </div>
       </a>

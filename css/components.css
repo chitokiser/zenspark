@@ -1289,6 +1289,9 @@
   .hero__content { margin-bottom: 120px; }
   .notice-card__thumb { height: 160px; }
 }
+@media (max-width: 768px) {
+  .svc-feature-grid { grid-template-columns: 1fr !important; }
+}
 @media (max-width: 480px) {
   .services-grid { grid-template-columns: 1fr; }
   .notices-grid { grid-template-columns: 1fr; }
