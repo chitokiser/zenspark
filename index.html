@@ -188,7 +188,7 @@
 <section class="section notices-section">
   <div class="container">
     <div class="section-header fade-in" style="position:relative;">
-      <span class="label" data-i18n="notices_label">공지사항</span>
+      <span class="label" data-i18n="notices_label">이벤트</span>
       <h2 data-i18n="notices_title">최신 소식</h2>
       <p data-i18n="notices_desc">Zen Spark Gallery의 새로운 소식과 이벤트를 만나보세요.</p>
       <button id="notice-write-btn" class="btn btn--gold notice-write-btn" style="display:none;" onclick="Notices.openWrite()">+ 공지 작성</button>
@@ -201,7 +201,7 @@
 <div id="notice-write-modal" class="modal-overlay">
   <div class="modal modal--wide">
     <button id="notice-modal-close" class="modal__close" aria-label="Close">✕</button>
-    <h2 class="modal__title" id="notice-modal-label">공지 작성</h2>
+    <h2 class="modal__title" id="notice-modal-label">이벤트작성</h2>
     <span class="gold-rule"></span>
 
     <div class="form-group">
@@ -216,14 +216,31 @@
 
     <div class="form-group">
       <label>이미지 (선택)</label>
-      <div id="image-upload-area" class="image-upload-area">
-        <div id="image-placeholder" class="image-placeholder">
-          <span>🖼</span>
-          <p>클릭하여 이미지를 업로드하세요</p>
+      <div class="img-tab-bar">
+        <button type="button" class="img-tab img-tab--active" data-tab="file">파일 업로드</button>
+        <button type="button" class="img-tab" data-tab="url">URL 입력</button>
+      </div>
+      <!-- 파일 업로드 패널 -->
+      <div id="img-panel-file" class="img-panel">
+        <div id="image-upload-area" class="image-upload-area">
+          <div id="image-placeholder" class="image-placeholder">
+            <span>🖼</span>
+            <p>클릭하여 이미지를 업로드하세요</p>
+          </div>
+          <img id="image-preview" src="" alt="미리보기" style="display:none;max-width:100%;max-height:220px;border-radius:6px;">
+          <button type="button" id="image-remove-btn" class="image-remove-btn" style="display:none;">✕ 이미지 제거</button>
+          <input type="file" id="notice-image-input" accept="image/*" style="display:none;">
         </div>
-        <img id="image-preview" src="" alt="미리보기" style="display:none;max-width:100%;max-height:220px;border-radius:6px;">
-        <button type="button" id="image-remove-btn" class="image-remove-btn" style="display:none;">✕ 이미지 제거</button>
-        <input type="file" id="notice-image-input" accept="image/*" style="display:none;">
+      </div>
+      <!-- URL 입력 패널 -->
+      <div id="img-panel-url" class="img-panel" style="display:none;">
+        <input type="url" id="notice-image-url" class="form-control"
+               placeholder="https://example.com/image.jpg">
+        <div id="url-preview-wrap" style="margin-top:0.75rem;display:none;">
+          <img id="url-preview-img" src="" alt="미리보기"
+               style="max-width:100%;max-height:220px;border-radius:6px;display:block;">
+          <button type="button" id="url-preview-clear" class="image-remove-btn" style="margin-top:0.5rem;">✕ URL 제거</button>
+        </div>
       </div>
     </div>
 
@@ -242,27 +259,58 @@
   </div>
 </div>
 
-<!-- ===== GOOGLE MAP ===== -->
+<!-- ===== LOCATION ===== -->
 <section class="section map-section">
   <div class="container">
     <div class="section-header fade-in">
-      <span class="label" data-i18n="map_label">오시는 길</span>
+      <span class="label" data-i18n="map_label">주요 시설</span>
       <h2 data-i18n="map_title">Yen Tu 위치</h2>
       <p data-i18n="map_desc">베트남 꽝닌성 옌뚜산 — 선불교의 성지</p>
     </div>
-    <div id="map-container" class="fade-in"></div>
-    <div class="map-info fade-in fade-in-delay-2">
-      <div class="map-info-item">
-        <div class="icon">📍</div>
-        <h4 data-i18n="map_label">주소</h4>
-        <p data-i18n="map_address">옌뚜산, 동찌에우, 꽝닌성, 베트남</p>
+
+    <!-- Yen Tu Village 가맹점 카드 (고정값) -->
+    <div class="yentu-merchant fade-in">
+      <div class="yentu-merchant__map">
+        <iframe
+          src="https://www.openstreetmap.org/export/embed.html?bbox=106.6858%2C21.0989%2C106.7458%2C21.1589&amp;layer=mapnik&amp;marker=21.1289%2C106.7158"
+          style="border:0;width:100%;height:100%;"
+          loading="lazy"
+          title="Yen Tu Village 위치"
+          allowfullscreen></iframe>
       </div>
-      <div class="map-info-item">
-        <div class="icon">🕐</div>
-        <h4>운영 시간</h4>
-        <p data-i18n="map_hours">연중무휴 08:00 — 18:00</p>
+      <div class="yentu-merchant__info">
+        <div class="yentu-merchant__badge">Zen Spark Gallery</div>
+        <h3 class="yentu-merchant__name">Yen Tu Village</h3>
+        <p class="yentu-merchant__sub">옌뚜 빌리지</p>
+        <ul class="yentu-merchant__list">
+          <li>
+            <span class="yentu-icon">📍</span>
+            <span data-i18n="map_address">Dong Trieu, Quang Ninh, Vietnam</span>
+          </li>
+          <li>
+            <span class="yentu-icon">🕐</span>
+            <span data-i18n="map_hours">연중무휴 08:00 — 18:00</span>
+          </li>
+          <li>
+            <span class="yentu-icon">☯</span>
+            <span>선불교 성지 · 케이블카 · 유기농 체험</span>
+          </li>
+          <li>
+            <span class="yentu-icon">📞</span>
+            <span>+84 203 3584 868</span>
+          </li>
+        </ul>
+        <div class="yentu-merchant__actions">
+          <a href="https://maps.google.com/?q=21.1289,106.7158" target="_blank" class="btn btn--outline">
+            Google Maps →
+          </a>
+          <a href="https://jump22.netlify.app/merchants" target="_blank" class="btn btn--gold">
+            가맹점 보기 →
+          </a>
+        </div>
       </div>
     </div>
+
   </div>
 </section>
 
@@ -414,13 +462,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-storage-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="js/notices.js"></script>
-<script src="js/map.js"></script>
 <script src="js/main.js"></script>
-
-<!-- Google Maps -->
-<script async defer
-  src="https://maps.googleapis.com/maps/api/js?key=AIzaSyATCVXm6zBZ3ozM5A-GOT6pDJ66LRjPGiQ&callback=initGoogleMap">
-</script>
 
 <script>
   document.addEventListener('DOMContentLoaded', () => {

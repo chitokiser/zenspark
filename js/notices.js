@@ -32,29 +32,50 @@ const Notices = (() => {
 
   /* ── Firestore CRUD ── */
   async function fetchAll(limit = 9) {
-    const snap = await db.collection('notices')
-      .orderBy('createdAt', 'desc')
+    const snap = await db.collection('community_events')
+      .orderBy('eventDate', 'desc')
       .limit(limit)
       .get();
-    return snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    return snap.docs.map(d => {
+      const data = d.data();
+      return {
+        id:       d.id,
+        title:    data.name || data.title || '(제목 없음)',
+        content:  data.content || '',
+        imageUrl: data.photoUrl || data.imageUrl || null,
+        createdAt: data.eventDate || data.createdAt || null,
+        author:   data.author || '',
+        location: data.location || '',
+      };
+    });
   }
 
   async function saveNew({ title, content, imageUrl, author }) {
-    return db.collection('notices').add({
-      title, content, imageUrl: imageUrl || null, author,
-      createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+    return db.collection('community_events').add({
+      name:          title,
+      content:       content,
+      photoUrl:      imageUrl || null,
+      author:        author,
+      eventDate:     firebase.firestore.FieldValue.serverTimestamp(),
+      scheduleType:  'once',
+      stakeRequired: 0,
+      voucherPrice:  0,
+      ratingSum:     0,
+      ratingCount:   0,
     });
   }
 
   async function saveEdit(id, { title, content, imageUrl }) {
-    return db.collection('notices').doc(id).update({
-      title, content, imageUrl: imageUrl || null,
+    return db.collection('community_events').doc(id).update({
+      name:      title,
+      content:   content,
+      photoUrl:  imageUrl || null,
       updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
     });
   }
 
   async function removeDoc(id) {
-    return db.collection('notices').doc(id).delete();
+    return db.collection('community_events').doc(id).delete();
   }
 
   /* ── 이미지 업로드 ── */
@@ -140,19 +161,36 @@ const Notices = (() => {
     document.getElementById('notice-detail-modal').classList.add('active');
   }
 
+  /* ── 이미지 탭 ── */
+  function _activeTab() {
+    const active = document.querySelector('.img-tab--active');
+    return active ? active.dataset.tab : 'file';
+  }
+
+  function switchImgTab(tab) {
+    document.querySelectorAll('.img-tab').forEach(btn => {
+      btn.classList.toggle('img-tab--active', btn.dataset.tab === tab);
+    });
+    document.getElementById('img-panel-file').style.display = tab === 'file' ? '' : 'none';
+    document.getElementById('img-panel-url').style.display  = tab === 'url'  ? '' : 'none';
+  }
+
   /* ── 작성/수정 모달 ── */
   function resetWriteForm() {
     document.getElementById('notice-title-input').value   = '';
     document.getElementById('notice-content-input').value = '';
     document.getElementById('notice-image-input').value   = '';
+    document.getElementById('notice-image-url').value     = '';
     setPreview(null);
+    setUrlPreview(null);
+    switchImgTab('file');
     _keepImgUrl = null;
     _editingId  = null;
   }
 
   function setPreview(src) {
-    const prev = document.getElementById('image-preview');
-    const ph   = document.getElementById('image-placeholder');
+    const prev  = document.getElementById('image-preview');
+    const ph    = document.getElementById('image-placeholder');
     const rmBtn = document.getElementById('image-remove-btn');
     if (src) {
       prev.src = src; prev.style.display = 'block';
@@ -162,6 +200,18 @@ const Notices = (() => {
       prev.style.display = 'none';
       ph.style.display   = '';
       if (rmBtn) rmBtn.style.display = 'none';
+    }
+  }
+
+  function setUrlPreview(src) {
+    const wrap = document.getElementById('url-preview-wrap');
+    const img  = document.getElementById('url-preview-img');
+    if (src) {
+      img.src = src;
+      wrap.style.display = '';
+    } else {
+      img.src = '';
+      wrap.style.display = 'none';
     }
   }
 
@@ -180,7 +230,16 @@ const Notices = (() => {
     document.getElementById('notice-title-input').value   = n.title;
     document.getElementById('notice-content-input').value = n.content || '';
     document.getElementById('notice-image-input').value   = '';
-    setPreview(_keepImgUrl);
+
+    if (_keepImgUrl) {
+      /* 기존 이미지가 URL이면 URL 탭으로 열기 */
+      switchImgTab('url');
+      document.getElementById('notice-image-url').value = _keepImgUrl;
+      setUrlPreview(_keepImgUrl);
+    } else {
+      switchImgTab('file');
+      setPreview(null);
+    }
     document.getElementById('notice-modal-label').textContent = '공지 수정';
     document.getElementById('notice-write-modal').classList.add('active');
   }
@@ -188,7 +247,6 @@ const Notices = (() => {
   async function submit() {
     const title   = document.getElementById('notice-title-input').value.trim();
     const content = document.getElementById('notice-content-input').value.trim();
-    const file    = document.getElementById('notice-image-input').files[0];
     if (!title) { showToast('제목을 입력하세요.', 'error'); return; }
 
     const btn = document.getElementById('notice-submit-btn');
@@ -198,10 +256,18 @@ const Notices = (() => {
     try {
       await ensureAuth();
       let imageUrl = _keepImgUrl;
-      if (file) {
-        showToast('이미지 업로드 중…');
-        imageUrl = await uploadImage(file);
+
+      if (_activeTab() === 'url') {
+        const typed = document.getElementById('notice-image-url').value.trim();
+        imageUrl = typed || null;
+      } else {
+        const file = document.getElementById('notice-image-input').files[0];
+        if (file) {
+          showToast('이미지 업로드 중…');
+          imageUrl = await uploadImage(file);
+        }
       }
+
       const user = window.Auth ? Auth.getUser() : null;
 
       if (_editingId) {
@@ -279,6 +345,32 @@ const Notices = (() => {
       _keepImgUrl = null;
       document.getElementById('notice-image-input').value = '';
       setPreview(null);
+    });
+
+    /* 이미지 탭 전환 */
+    document.querySelectorAll('.img-tab').forEach(btn =>
+      btn.addEventListener('click', () => {
+        switchImgTab(btn.dataset.tab);
+        _keepImgUrl = null;
+        setPreview(null);
+        setUrlPreview(null);
+        document.getElementById('notice-image-input').value = '';
+        document.getElementById('notice-image-url').value   = '';
+      })
+    );
+
+    /* URL 입력 → 실시간 미리보기 */
+    document.getElementById('notice-image-url')?.addEventListener('input', e => {
+      const val = e.target.value.trim();
+      if (val) { setUrlPreview(val); _keepImgUrl = null; }
+      else setUrlPreview(null);
+    });
+
+    /* URL 미리보기 제거 */
+    document.getElementById('url-preview-clear')?.addEventListener('click', () => {
+      document.getElementById('notice-image-url').value = '';
+      setUrlPreview(null);
+      _keepImgUrl = null;
     });
 
     /* 관리자 상태 변화 감지 */
