@@ -88,7 +88,46 @@ const Auth = (() => {
     client.requestAccessToken({ prompt: 'select_account' });
   }
 
-  /* ── Jump ID Login ── */
+  /* ── Jump Popup Login (원클릭 SSO) ── */
+  let _jumpPopup = null;
+
+  function loginWithJumpPopup() {
+    const w = 480, h = 660;
+    const left = Math.round((screen.width  - w) / 2);
+    const top  = Math.round((screen.height - h) / 2);
+    if (_jumpPopup && !_jumpPopup.closed) { _jumpPopup.focus(); return; }
+    _jumpPopup = window.open(
+      `${JUMP_API_BASE}`,
+      'jump_login',
+      `width=${w},height=${h},left=${left},top=${top},toolbar=no,menubar=no,location=yes,status=no,resizable=yes`
+    );
+    if (!_jumpPopup) {
+      showToast('팝업이 차단되었습니다. 브라우저에서 팝업 허용 후 다시 시도하세요.', 'error');
+    }
+  }
+
+  /* jump22에서 postMessage로 인증 정보를 보내면 자동 로그인 처리 */
+  window.addEventListener('message', e => {
+    if (e.origin !== JUMP_API_BASE) return;
+    const data = e.data;
+    if (!data || data.type !== 'jump_auth') return;
+    const u = {
+      id:       data.user?.id       || data.user?.loginId || '',
+      loginId:  data.user?.loginId  || data.user?.id      || '',
+      name:     data.user?.name     || '',
+      email:    data.user?.email    || '',
+      avatar:   data.user?.avatar   || null,
+      provider: 'jump',
+      role:     data.user?.role     || 'user',
+      token:    data.token          || data.user?.token   || '',
+    };
+    if (_jumpPopup && !_jumpPopup.closed) _jumpPopup.close();
+    saveUser(u);
+    closeLoginModal();
+    showToast(Language.get('toast_login_ok'), 'success');
+  });
+
+  /* ── Jump ID Login (직접 입력 폼) ── */
   async function loginWithJump(id, password) {
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), 5000);
@@ -198,8 +237,22 @@ const Auth = (() => {
     const googleBtn = document.getElementById('google-login-btn');
     if (googleBtn) googleBtn.addEventListener('click', loginWithGoogle);
 
-    /* Jump login form */
-    const jumpForm = document.getElementById('jump-login-form');
+    /* Jump popup btn (원클릭 로그인) */
+    const jumpPopupBtn = document.getElementById('jump-popup-btn');
+    if (jumpPopupBtn) jumpPopupBtn.addEventListener('click', loginWithJumpPopup);
+
+    /* Jump 직접 입력 토글 */
+    const jumpToggle = document.getElementById('jump-manual-toggle');
+    const jumpForm   = document.getElementById('jump-login-form');
+    if (jumpToggle && jumpForm) {
+      jumpToggle.addEventListener('click', () => {
+        const hidden = jumpForm.style.display === 'none';
+        jumpForm.style.display = hidden ? '' : 'none';
+        jumpToggle.textContent = hidden ? '직접 입력 닫기' : '아이디/비밀번호로 직접 입력';
+      });
+    }
+
+    /* Jump login form (직접 입력 폼 제출) */
     if (jumpForm) {
       jumpForm.addEventListener('submit', async e => {
         e.preventDefault();
