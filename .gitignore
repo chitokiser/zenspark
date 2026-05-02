@@ -1,0 +1,9 @@
+# 환경 설정 (API 키 포함 — 절대 커밋하지 마세요)
+js/config.js
+.env
+
+# OS / Editor
+.DS_Store
+Thumbs.db
+.vscode/
+*.log

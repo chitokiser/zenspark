@@ -1,5 +1,5 @@
 /* ===== Auth Module ===== */
-const JUMP_API_KEY  = '3fd9afc326ff3f687197f3fbc8f746133d513e5f3237a54a94cd87a3dd3b56cf';
+const JUMP_API_KEY  = (window.APP_CONFIG && window.APP_CONFIG.jumpApiKey) || '';
 const JUMP_API_BASE = 'https://jump22.netlify.app';
 
 /* ── 관리자 설정 ── 본인 Jump ID / Google 이메일 추가 */
