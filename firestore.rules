@@ -1,0 +1,610 @@
+// /firestore.rules
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    // ??곸겫????李???봔?紐꾨뮞?紐껋삫??
+    function isOperatorEmail() {
+      return signedIn()
+        && (request.auth.token.email is string)
+        && (request.auth.token.email == "daguri75@gmail.com");
+    }
+
+    function isAdmin() {
+      return signedIn()
+        && (
+          exists(/databases/$(database)/documents/admins/$(request.auth.uid))
+          || isOperatorEmail()
+        );
+    }
+
+    // orders ??ｊ탷?癒?퐣筌??怨뺣뮉 ?닌됤꼻??揶쎛??諭??癒?젟
+    function isOrderBuyer() {
+      return signedIn()
+        && (resource.data.buyerUid is string)
+        && resource.data.buyerUid == request.auth.uid;
+    }
+
+    function isOrderGuide() {
+      return signedIn()
+        && (resource.data.guideUid is string)
+        && resource.data.guideUid == request.auth.uid;
+    }
+
+    // ?닌됤꼻?癒? ??륁젟 揶쎛?館釉???? "野껉퀣?ｏ쭩?명뒅 ?袁⑹뒠"??곗쨮 ??쀫립
+    function buyerPayProofUpdateOnly() {
+      let changed = request.resource.data.diff(resource.data).affectedKeys();
+      return changed.hasOnly(["proof","paymentStatus","payProofUpdatedAt"]);
+    }
+
+    match /admins/{uid} {
+      allow get: if signedIn() && request.auth.uid == uid;
+      allow list: if isAdmin();
+      allow create, update, delete: if isAdmin();
+    }
+
+    // ?⑤벊???鍮?notices)
+    match /notices/{noticeId} {
+      allow get, list: if true;
+      allow create, update, delete: if isAdmin();
+    }
+
+    // 揶쎛??諭???????醫롪퍕??(guideApplications/{uid})
+    match /guideApplications/{uid} {
+      allow get: if isAdmin() || (signedIn() && request.auth.uid == uid);
+      allow list: if isAdmin();
+
+      allow create: if signedIn() && request.auth.uid == uid;
+
+      // ??FIX: ?온?귐딆쁽???諭??獄쏆꼶??筌ｌ꼶?곭몴??袁る퉸 update 揶쎛?館鍮????      allow update: if isAdmin() || (signedIn() && request.auth.uid == uid);
+
+      allow delete: if isAdmin();
+    }
+
+    // 揶쎛??諭??袁⑥쨮??(guides/{uid})
+    match /guides/{uid} {
+      allow get: if isAdmin()
+                || (signedIn() && request.auth.uid == uid)
+                || (resource.data.approved == true);
+      allow list: if isAdmin();
+
+      // ??FIX: ?諭?????온?귐딆쁽揶쎛 guides/{uid}????밴쉐??곷튊 ??롫뮉 ?냈??곷뮞揶쎛 筌띾‘??      allow create: if isAdmin() || (signedIn() && request.auth.uid == uid);
+
+      allow update: if isAdmin() || (signedIn() && request.auth.uid == uid);
+      allow delete: if false;
+    }
+
+    // ?怨밸?(items)
+    match /items/{itemId} {
+
+      function isOwner() {
+        return signedIn() && (
+          (resource.data.ownerUid is string && resource.data.ownerUid == request.auth.uid)
+          || (resource.data.guideUid is string && resource.data.guideUid == request.auth.uid)
+        );
+      }
+
+      function isPublicItem() {
+        return (resource.data.status in ["published", "approved"]);
+      }
+
+      allow get: if isAdmin() || isOwner() || isPublicItem();
+      allow list: if true;
+
+      allow create: if signedIn()
+        && (request.resource.data.ownerUid is string)
+        && request.resource.data.ownerUid == request.auth.uid;
+
+      allow update: if isAdmin() || isOwner();
+
+      allow delete: if isAdmin()
+        || (signedIn() && (resource.data.ownerUid is string) && resource.data.ownerUid == request.auth.uid);
+
+      match /reviews/{uid} {
+        allow get, list: if isAdmin() || isPublicItem() || isOwner();
+        allow create, update: if signedIn() && request.auth.uid == uid;
+        allow delete: if isAdmin();
+      }
+    }
+
+    // ?귐됰윮 (SSOT)
+    match /reviews/{orderId} {
+
+      function orderExistsAndMine() {
+        return signedIn()
+          && exists(/databases/$(database)/documents/orders/$(orderId))
+          && get(/databases/$(database)/documents/orders/$(orderId)).data.buyerUid == request.auth.uid
+          && (
+            get(/databases/$(database)/documents/orders/$(orderId)).data.paymentStatus in ["confirmed","settled","completed"]
+            || get(/databases/$(database)/documents/orders/$(orderId)).data.status in ["confirmed","settled","completed"]
+          );
+      }
+
+      function isReviewAuthor() {
+        return signedIn()
+          && (resource.data.authorUid is string)
+          && resource.data.authorUid == request.auth.uid;
+      }
+
+      function isReviewGuide() {
+        return signedIn()
+          && (resource.data.guideUid is string)
+          && resource.data.guideUid == request.auth.uid;
+      }
+
+      function authorUpdateOnly() {
+        let changed = request.resource.data.diff(resource.data).affectedKeys();
+        return changed.hasOnly(["rating","text","updatedAt"]);
+      }
+
+      function guideReplyOnly() {
+        let changed = request.resource.data.diff(resource.data).affectedKeys();
+        return changed.hasOnly(["guideReply","updatedAt"]);
+      }
+
+      allow get, list: if true;
+
+      allow create: if orderExistsAndMine()
+        && (request.resource.data.authorUid is string)
+        && request.resource.data.authorUid == request.auth.uid
+        && (request.resource.data.orderId == orderId);
+
+      allow update: if isAdmin()
+        || (isReviewAuthor() && authorUpdateOnly())
+        || (isReviewGuide() && guideReplyOnly());
+
+      allow delete: if isAdmin();
+    }
+
+    // 雅뚯눖揆(orders)
+    match /orders/{orderId} {
+      allow get: if isAdmin() || isOrderBuyer() || isOrderGuide();
+      allow list: if signedIn();
+
+      allow create: if signedIn()
+        && (request.resource.data.buyerUid is string)
+        && request.resource.data.buyerUid == request.auth.uid;
+
+      allow update: if isAdmin()
+        || (isOrderBuyer() && buyerPayProofUpdateOnly());
+
+      allow delete: if isAdmin();
+    }
+
+    // slots
+    match /slots/{slotId} {
+      allow get, list: if true;
+
+      allow create: if signedIn()
+        && (request.resource.data.itemId is string)
+        && (request.resource.data.date is string)
+        && (request.resource.data.capacity is number)
+        && (request.resource.data.booked is number)
+        && request.resource.data.booked >= 0
+        && request.resource.data.capacity >= 0;
+
+      allow update: if signedIn()
+        && (resource.data.booked is number)
+        && (request.resource.data.booked is number)
+        && request.resource.data.booked >= resource.data.booked;
+
+      allow delete: if isAdmin();
+    }
+
+    // users/{uid}
+    match /users/{uid} {
+      // ??FIX: ?온?귐딆쁽 ?諭????role/profile???節뚮선?????嚥?admin create/update ??됱뒠
+      allow get: if isAdmin() || (signedIn() && request.auth.uid == uid);
+      allow create: if isAdmin() || (signedIn() && request.auth.uid == uid);
+      allow update: if isAdmin() || (signedIn() && request.auth.uid == uid);
+
+      allow list, delete: if isAdmin();
+    }
+
+    // settlements
+    match /settlements/{ym} {
+      allow get: if isAdmin() || signedIn();
+      allow list: if isAdmin();
+      allow create, update, delete: if isAdmin();
+
+      match /guides/{uid} {
+        allow get: if isAdmin() || (signedIn() && request.auth.uid == uid);
+        allow list: if isAdmin();
+        allow create, update, delete: if isAdmin();
+      }
+    }
+
+    // (??뉕탢?? settlementRuns
+    match /settlementRuns/{ym} {
+      allow get: if isAdmin() || signedIn();
+      allow list: if isAdmin();
+      allow create, update, delete: if isAdmin();
+
+      match /guides/{uid} {
+        allow get: if isAdmin() || (signedIn() && request.auth.uid == uid);
+        allow list: if isAdmin();
+        allow create, update, delete: if isAdmin();
+      }
+    }
+
+    // guideOrders
+    match /guideOrders/{guideUid} {
+      allow get: if isAdmin() || (signedIn() && request.auth.uid == guideUid);
+      allow list: if isAdmin();
+      allow create, update, delete: if isAdmin();
+
+      match /orders/{orderId} {
+        allow get, list: if isAdmin() || (signedIn() && request.auth.uid == guideUid);
+        allow create, update, delete: if isAdmin();
+      }
+    }
+
+    // settings
+    match /settings/{docId} {
+      allow get: if signedIn();
+      allow list: if isAdmin();
+      allow create, update, delete: if isAdmin();
+    }
+
+    // ????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????
+    // ??묎맒??筌왖揶????醫됲뇣 ?뚎됱젂??    // 筌뤴뫀諭??怨뚮┛??Cloud Functions(Admin SDK)??筌ｌ꼶?????????곷섧??write ?븍뜇肉
+    // ????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????
+
+    // ?癒곗넅 ?겸뫗???遺욧퍕 (deposits/{refCode})
+    // - ?醫?: ?癒?뻿???遺욧퍕筌???꾨┛ 揶쎛??    // - ?온?귐딆쁽: ?袁⑷퍥 ??꾨┛
+    // - ?怨뚮┛: Cloud Functions筌?(?????곷섧??筌욊낯???怨뚮┛ ?븍뜇肉)
+    match /deposits/{refCode} {
+      allow get: if isAdmin()
+        || (signedIn()
+            && resource.data.uid is string
+            && resource.data.uid == request.auth.uid);
+
+      allow list: if isAdmin()
+        || (signedIn()
+            && resource.data.uid is string
+            && resource.data.uid == request.auth.uid);
+
+      allow create, update, delete: if false; // Cloud Functions(Admin SDK) ?袁⑹뒠
+    }
+
+        // mentors (mentors/{email})
+    match /mentors/{email} {
+      allow get, list: if signedIn();
+      allow create, update, delete: if false; // Cloud Functions only
+    }
+
+    // mentorRequests — 멘토 연결 요청
+    match /mentorRequests/{uid} {
+      allow get: if isAdmin() || (signedIn() && request.auth.uid == uid);
+      allow list: if isAdmin();
+      allow create, update: if signedIn() && request.auth.uid == uid;
+      allow delete: if isAdmin();
+    }
+
+    // transactions (transactions/{docId})
+    match /transactions/{docId} {
+      allow get: if isAdmin()
+        || (signedIn()
+            && resource.data.uid is string
+            && resource.data.uid == request.auth.uid);
+
+      allow list: if isAdmin()
+        || (signedIn()
+            && resource.data.uid is string
+            && resource.data.uid == request.auth.uid);
+      allow create, update, delete: if false; // Cloud Functions only
+    }
+
+    // merchants (merchants/{merchantId})
+    match /merchants/{merchantId} {
+      allow get, list: if true;
+      allow create, delete: if false; // Cloud Functions only
+      allow update: if isAdmin();     // 관리자 직접 수정 허용 (gmap 등)
+    }
+
+    // places (places/{placeId})
+    match /places/{placeId} {
+      allow get, list: if true;
+      allow create, update, delete: if isAdmin();
+    }
+
+    // coop config
+    match /coopConfig/{docId} {
+      allow get, list: if signedIn();
+      allow create, update, delete: if isAdmin();
+    }
+
+    // coop products
+    match /coopProducts/{productId} {
+      allow get, list: if true;
+      allow create, update, delete: if isAdmin();
+    }
+
+    // coop orders
+    match /coopOrders/{orderId} {
+      allow get: if isAdmin()
+        || (signedIn() && resource.data.uid == request.auth.uid);
+      allow list: if isAdmin()
+        || (signedIn() && resource.data.uid == request.auth.uid);
+      allow create, update, delete: if false;
+    }
+    // sponsor banners
+    match /sponsorBanners/{bannerId} {
+      allow get, list: if true;
+      allow create, update, delete: if isAdmin();
+    }
+
+    // jackpot rounds (공개 통계 조회용)
+    match /jackpot_rounds/{roundId} {
+      allow get, list: if true;
+      allow create, update, delete: if false;
+    }
+
+    // jackpot wins — 아이템 잭팟 당첨 기록 (공개 읽기)
+    match /jackpot_wins/{docId} {
+      allow get, list: if true;
+      allow create, update, delete: if false; // Cloud Functions only
+    }
+
+    // jackpot config — 잭팟 누적금액 캐시 (공개 읽기)
+    match /jackpot_config/{docId} {
+      allow get, list: if true;
+      allow create, update, delete: if false; // Cloud Functions only
+    }
+// used market posts
+    match /usedMarketPosts/{postId} {
+      allow get, list: if true;
+      allow create: if signedIn()
+        && request.resource.data.sellerUid is string
+        && request.resource.data.sellerUid == request.auth.uid;
+      allow update, delete: if isAdmin()
+        || (signedIn()
+            && resource.data.sellerUid is string
+            && resource.data.sellerUid == request.auth.uid);
+    }
+
+    // ohlc (HEX/KRW 캔들 차트 데이터) — 공개 읽기
+    match /ohlc/{docId} {
+      allow get, list: if true;
+      allow create, update, delete: if false;
+    }
+
+    // ── ZaloPay 포인트 시스템 ──────────────────────────────────────
+    // zalo_requests: HEX → 포인트 전환 신청
+    match /zalo_requests/{docId} {
+      allow get: if isAdmin()
+        || (signedIn() && resource.data.uid == request.auth.uid);
+      allow list: if isAdmin()
+        || (signedIn()
+            && resource.data.uid is string
+            && resource.data.uid == request.auth.uid);
+      allow create, update, delete: if false; // Cloud Functions only
+    }
+
+    // zalo_usage: 포인트 사용 내역
+    match /zalo_usage/{docId} {
+      allow get: if isAdmin()
+        || (signedIn() && resource.data.uid == request.auth.uid);
+      allow list: if isAdmin()
+        || (signedIn()
+            && resource.data.uid is string
+            && resource.data.uid == request.auth.uid);
+      allow create, update, delete: if false; // Cloud Functions only
+    }
+
+    // zalo_transactions: 포인트 입출금 로그
+    match /zalo_transactions/{docId} {
+      allow get: if isAdmin()
+        || (signedIn() && resource.data.uid == request.auth.uid);
+      allow list: if isAdmin()
+        || (signedIn()
+            && resource.data.uid is string
+            && resource.data.uid == request.auth.uid);
+      allow create, update, delete: if false; // Cloud Functions only
+    }
+
+    // ── 보물찾기 시스템 ────────────────────────────────────────────
+    match /treasure_items/{docId} {
+      allow get, list: if true;           // 아이템 정보 공개
+      allow write: if false;              // Cloud Function only
+    }
+    match /treasure_boxes/{docId} {
+      allow get, list: if true;           // 박스 위치 공개 (지도 표시)
+      allow write: if false;
+    }
+    match /treasure_inventory/{docId} {
+      allow get, list: if signedIn()
+        && resource.data.uid == request.auth.uid;
+      allow write: if false;
+    }
+    match /treasure_logs/{docId} {
+      allow get: if signedIn()
+        && resource.data.uid == request.auth.uid;
+      allow list: if isAdmin();
+      allow write: if false;
+    }
+    match /treasure_vouchers/{docId} {
+      allow get, list: if true;
+      allow write: if false;
+    }
+    match /treasure_voucher_logs/{docId} {
+      allow get, list: if signedIn()
+        && resource.data.uid == request.auth.uid;
+      allow write: if false;
+    }
+    match /treasure_inventory_boxes/{docId} {
+      allow get, list: if signedIn()
+        && resource.data.uid == request.auth.uid;
+      allow write: if false;
+    }
+
+    // ── 위치 기반 전투 시스템 ─────────────────────────────────────
+    match /battle_monsters/{docId} {
+      allow get, list: if true;
+      allow create, update, delete: if isAdmin();
+    }
+    match /battle_towers/{docId} {
+      allow get, list: if true;
+      allow create, update, delete: if isAdmin();
+    }
+    match /map_decorations/{docId} {
+      allow get, list: if true;
+      allow create, update, delete: if isAdmin();
+    }
+    match /battle_players/{uid} {
+      allow get: if signedIn() && request.auth.uid == uid;
+      allow list: if isAdmin();
+      allow create, update: if signedIn() && request.auth.uid == uid;
+      allow delete: if isAdmin();
+    }
+
+    // ── Zen Spark 커뮤니티 게시판 ────────────────────────────────────
+    match /community_posts/{postId} {
+      allow read: if true;
+      allow create: if request.auth != null;
+      allow update: if request.auth != null;
+      allow delete: if isAdmin()
+        || (request.auth != null && resource.data.authorId == request.auth.uid);
+    }
+
+    // ── 소셜 커뮤니티 (community_events) ─────────────────────────────
+    match /community_events/{eventId} {
+      allow get, list: if true;                        // 누구나 읽기
+      allow create: if isAdmin();                      // 관리자만 등록
+      allow update, delete: if isAdmin()
+        || (signedIn() && resource.data.authorUid == request.auth.uid);
+
+      // 평점(후기) 서브컬렉션 — 문서 ID = uid (1인 1후기)
+      match /reviews/{reviewId} {
+        allow get, list: if true;
+        allow create: if signedIn()
+          && reviewId == request.auth.uid      // 본인 uid로만 생성 가능
+          && !exists(/databases/$(database)/documents/community_events/$(eventId)/reviews/$(request.auth.uid));
+        allow update, delete: if isAdmin();    // 수정·삭제는 관리자만
+      }
+
+      // 댓글 서브컬렉션
+      match /comments/{commentId} {
+        allow get, list: if true;
+        allow create: if signedIn();
+        allow update, delete: if isAdmin()
+          || (signedIn() && resource.data.uid == request.auth.uid);
+      }
+    }
+
+    // 커뮤니티 행사 바우처 (community_event_vouchers/{uid_eventId})
+    match /community_event_vouchers/{docId} {
+      allow get: if signedIn()
+        && (resource.data.uid == request.auth.uid || isAdmin());
+      allow list: if isAdmin();
+      allow write: if false; // Cloud Function only
+    }
+
+    // 바우처 정산 (community_voucher_settlements/{docId})
+    match /community_voucher_settlements/{docId} {
+      allow get: if isAdmin()
+        || (signedIn() && resource.data.sellerUid == request.auth.uid);
+      allow list: if isAdmin()
+        || (signedIn() && resource.data.sellerUid == request.auth.uid);
+      allow write: if false; // Cloud Function only
+    }
+
+    // ── 버기카 호출 서비스 ────────────────────────────────────────────
+    // 등록된 기사 여부 확인
+    function isRegisteredDriver() {
+      return signedIn()
+        && exists(/databases/$(database)/documents/buggy_drivers/$(request.auth.uid));
+    }
+
+    match /buggy_config/{docId} {
+      allow get, list: if true;
+      allow write: if false; // Cloud Function only
+    }
+    match /buggy_rides/{rideId} {
+      // 본인 호출, 배정된 기사, 등록 기사(searching 수신용), 관리자
+      allow get: if isAdmin()
+        || isRegisteredDriver()
+        || (signedIn() && (resource.data.userId == request.auth.uid || resource.data.driverId == request.auth.uid));
+      allow list: if isAdmin()
+        || isRegisteredDriver()
+        || (signedIn() && resource.data.userId == request.auth.uid)
+        || (signedIn() && resource.data.driverId == request.auth.uid);
+      allow write: if false; // Cloud Function only
+    }
+    match /buggy_drivers/{driverUid} {
+      allow get: if isAdmin() || (signedIn() && request.auth.uid == driverUid);
+      allow list: if isAdmin();
+      allow write: if false; // Cloud Function only
+    }
+    match /buggy_driver_locations/{driverUid} {
+      allow get, list: if signedIn();                              // 탑승자도 실시간 위치 조회
+      allow write: if signedIn() && request.auth.uid == driverUid; // 기사 본인 직접 write
+    }
+    match /buggy_transactions/{docId} {
+      allow get: if isAdmin()
+        || (signedIn() && resource.data.userId == request.auth.uid);
+      allow list: if isAdmin()
+        || (signedIn() && resource.data.userId == request.auth.uid);
+      allow write: if false; // Cloud Function only
+    }
+    match /ride_audit_logs/{docId} {
+      allow get, list: if isAdmin();
+      allow write: if false;
+    }
+    match /payment_attempt_logs/{docId} {
+      allow get, list: if isAdmin();
+      allow write: if false;
+    }
+    match /buggy_driver_earnings/{docId} {
+      allow get: if isAdmin() || (signedIn() && resource.data.driverId == request.auth.uid);
+      allow list: if isAdmin() || (signedIn() && resource.data.driverId == request.auth.uid);
+      allow write: if false;
+    }
+
+    // ── DAO 의결 시스템 ────────────────────────────────────────────
+    // 안건 목록·상세: 누구나 읽기 가능
+    // 등록·지지·투표·댓글: Cloud Function 서버 사이드 처리 (직접 쓰기 불가)
+    match /dao_proposals/{proposalId} {
+      allow get, list: if true;
+      allow write: if false; // Cloud Function만 쓰기 가능
+
+      match /supporters/{uid} {
+        allow get: if signedIn() && request.auth.uid == uid;
+        allow list: if isAdmin();
+        allow write: if false;
+      }
+      match /votes/{uid} {
+        allow get: if signedIn() && request.auth.uid == uid;
+        allow list: if isAdmin();
+        allow write: if false;
+      }
+      match /comments/{commentId} {
+        allow get, list: if true;
+        allow write: if false;
+      }
+    }
+
+    // ── 실시간 유저 위치 (100m 반경 표시용) ──────────────────────────
+    match /user_locations/{uid} {
+      allow read: if signedIn();
+      allow write: if signedIn() && request.auth.uid == uid;
+    }
+
+    // ── 공유 전투 HP 상태 (클라이언트 쓰기 허용) ───────────────────────────────
+    match /battle_hp/{docId} {
+      allow read: if signedIn();
+      allow write: if signedIn();
+    }
+
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
+
+
+

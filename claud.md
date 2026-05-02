@@ -76,3 +76,4 @@ API 기반 통신 (REST or GraphQL)
 
 * 하드코딩 남발 금지
 * API 키 직접 노출 금지
+ *  storage.rules 또는 firestore.rules 수정시 이 파일은 jump와 공유하기 때문에 여기서 수정시에는 충돌이나 누락없이 해야 한다.

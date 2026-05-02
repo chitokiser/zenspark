@@ -308,10 +308,10 @@
       <span data-i18n="login_jump">Jump ID로 로그인</span>
     </button>
     <div style="text-align:center;margin-top:0.6rem;">
-      <button type="button" id="jump-manual-toggle" style="background:none;border:none;cursor:pointer;font-size:0.78rem;color:var(--gray-3);text-decoration:underline;padding:0;">아이디/비밀번호로 직접 입력</button>
+      <button type="button" id="jump-manual-toggle" style="background:none;border:none;cursor:pointer;font-size:0.78rem;color:var(--gray-3);text-decoration:underline;padding:0;">직접 입력 닫기</button>
     </div>
-    <!-- 직접 입력 폼 (기본 숨김) -->
-    <form id="jump-login-form" style="display:none;margin-top:1rem;">
+    <!-- 직접 입력 폼 -->
+    <form id="jump-login-form" style="display:block;margin-top:1rem;">
       <div class="form-group">
         <label for="jump-id" data-i18n="login_id">아이디</label>
         <input type="text" id="jump-id" class="form-control" placeholder="아이디" autocomplete="username">
@@ -370,7 +370,12 @@ function _fbInit() {
 
 async function _fbEnsureAuth() {
   _fbInit();
-  if (!_fbAuth.currentUser) await _fbAuth.signInAnonymously();
+  if (!_fbAuth.currentUser) {
+    try { await _fbAuth.signInAnonymously(); } catch(e) {
+      /* anonymous auth 비활성 시 무시 — Firestore 규칙이 열려 있으면 그냥 진행 */
+      console.warn('anonymous auth skipped:', e.code);
+    }
+  }
 }
 
 async function _fbUploadImage(file) {
