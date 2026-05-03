@@ -79,8 +79,8 @@
 <section class="section">
   <div class="container">
 
-    <!-- Feature highlight (My Page + Yen Tu Taxi + 보물찾기 — live links) -->
-    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:var(--spacing-lg);margin-bottom:var(--spacing-xl);" class="fade-in svc-feature-grid">
+    <!-- Feature highlight (My Page + Yen Tu Taxi + 보물찾기 + 회원전용몰 — live links) -->
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:var(--spacing-lg);margin-bottom:var(--spacing-xl);" class="fade-in svc-feature-grid">
       <!-- My Page -->
       <a href="https://jump22.netlify.app/mypage" target="_blank"
          class="service-card" style="display:flex;flex-direction:row;align-items:center;gap:0;padding:0;overflow:hidden;">
@@ -114,6 +114,17 @@
           <div class="service-card__link" data-i18n="svc_visit">바로가기 →</div>
         </div>
       </a>
+      <!-- 회원전용 패쇄몰 -->
+      <a href="https://jump22.netlify.app/coop" target="_blank"
+         class="service-card" style="display:flex;flex-direction:row;align-items:center;gap:0;padding:0;overflow:hidden;">
+        <div style="width:6px;background:var(--gold);align-self:stretch;flex-shrink:0;"></div>
+        <div style="padding:2rem;">
+          <div style="font-size:2rem;margin-bottom:0.75rem;">🛍</div>
+          <h3 class="service-card__title" data-i18n="svc_mall">Zen MemberShip Mall</h3>
+          <p class="service-card__desc" data-i18n="svc_mall_desc">회원 전용 패쇄몰</p>
+          <div class="service-card__link" data-i18n="svc_visit">바로가기 →</div>
+        </div>
+      </a>
     </div>
 
     <span class="gold-rule gold-rule--lg fade-in"></span>
@@ -134,16 +145,7 @@
           <span class="service-card__badge" data-i18n="svc_coming_soon">준비 중</span>
         </div>
 
-        <div class="service-card fade-in fade-in-delay-2">
-          <div class="service-card__icon">🛍</div>
-          <div class="service-card__body">
-            <h3 class="service-card__title" data-i18n="svc_mall">Zen Mall</h3>
-            <p class="service-card__desc" data-i18n="svc_mall_desc">선 철학이 담긴 예술품과 생활용품을 만나보세요.</p>
-          </div>
-          <span class="service-card__badge" data-i18n="svc_coming_soon">준비 중</span>
-        </div>
-
-        <div class="service-card fade-in fade-in-delay-3">
+<div class="service-card fade-in fade-in-delay-3">
           <div class="service-card__icon">🎁</div>
           <div class="service-card__body">
             <h3 class="service-card__title" data-i18n="svc_voucher">Zen Voucher</h3>
