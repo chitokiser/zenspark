@@ -19,8 +19,8 @@ const TRANSLATIONS = {
     hero_scroll:  'Scroll',
 
     /* Notices */
-    notices_label:  '공지사항',
-    notices_title:  '최신 소식',
+    notices_label:  '이벤트',
+    notices_title:  '정회원 혜택',
     notices_desc:   'Zen Spark Gallery의 새로운 소식과 이벤트를 만나보세요.',
     notices_more:   '더보기',
     notices_loading:'소식을 불러오는 중...',
@@ -131,8 +131,8 @@ const TRANSLATIONS = {
     hero_scroll:  'Scroll',
 
     /* Notices */
-    notices_label:  'News',
-    notices_title:  'Latest Updates',
+    notices_label:  'Events',
+    notices_title:  'Member Benefits',
     notices_desc:   'Discover the latest news and events from Zen Spark Gallery.',
     notices_more:   'View All',
     notices_loading:'Loading updates...',
