@@ -29,8 +29,13 @@ const Auth = (() => {
 
   function saveUser(u) {
     user = u;
-    if (u) localStorage.setItem('zsg_user', JSON.stringify(u));
-    else localStorage.removeItem('zsg_user');
+    if (u) {
+      localStorage.setItem('zsg_user', JSON.stringify(u));
+      _bridgeFirebaseSignIn();
+    } else {
+      localStorage.removeItem('zsg_user');
+      _bridgeFirebaseSignOut();
+    }
     document.dispatchEvent(new CustomEvent('authChange', { detail: { user } }));
     updateHeaderUI();
   }
@@ -223,6 +228,8 @@ const Auth = (() => {
 
   function init() {
     loadUser();
+    // Re-bridge Firebase Auth on page reload if already logged in
+    if (user) _bridgeFirebaseSignIn();
 
     /* Bind modal close */
     document.addEventListener('click', e => {
@@ -287,6 +294,39 @@ const Auth = (() => {
 })();
 
 window.Auth = Auth;
+
+/* ── Firebase Auth Bridge ──────────────────────────────────────────────────
+   ZenSpark uses its own SSO (Jump ID / Google Identity Services).
+   The 1:1 chat embed (support-chat-embed.js) requires a Firebase Auth user
+   via onAuthStateChanged. We bridge by signing in anonymously so the chat
+   widget gets a UID that matches the Firestore document path.
+   Anonymous UIDs are persisted by Firebase in IndexedDB, so the same user
+   keeps the same chat history across sessions in the same browser.
+   ────────────────────────────────────────────────────────────────────────── */
+async function _bridgeFirebaseSignIn() {
+  let auth = null;
+  for (let i = 0; i < 100; i++) {
+    if (window.__jumpChat?.auth) { auth = window.__jumpChat.auth; break; }
+    await new Promise(r => setTimeout(r, 50));
+  }
+  if (!auth) return;
+  // Skip if already signed in (e.g. page reload)
+  if (auth.currentUser) return;
+  try {
+    const { signInAnonymously } = await import('https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js');
+    await signInAnonymously(auth);
+  } catch (e) {
+    console.warn('[zsg] Firebase sign-in failed:', e.message);
+  }
+}
+
+async function _bridgeFirebaseSignOut() {
+  if (!window.__jumpChat?.auth) return;
+  try {
+    const { signOut } = await import('https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js');
+    await signOut(window.__jumpChat.auth);
+  } catch {}
+}
 
 /* ── Toast Helper ── */
 function showToast(msg, type = '') {
