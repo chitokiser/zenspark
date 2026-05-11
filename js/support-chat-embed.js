@@ -172,9 +172,7 @@ async function init() {
       if (msgs) {
         const alreadyLoggedIn = window.Auth?.isLoggedIn?.();
         if (alreadyLoggedIn) {
-          // ZenSpark 로그인은 됐지만 Firebase 익명 인증 미완료 — 재시도
-          msgs.innerHTML = `<div class="__jc-notice">채팅 연결 중…<br><small style="color:#94a3b8">잠시 후 자동으로 연결됩니다.</small></div>`;
-          setTimeout(() => window._bridgeFirebaseSignIn?.(), 3000);
+          msgs.innerHTML = `<div class="__jc-notice">채팅을 불러오는 중…</div>`;
         } else {
           msgs.innerHTML = `
             <div class="__jc-notice">
