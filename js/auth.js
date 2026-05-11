@@ -303,6 +303,7 @@ window.Auth = Auth;
    Anonymous UIDs are persisted by Firebase in IndexedDB, so the same user
    keeps the same chat history across sessions in the same browser.
    ────────────────────────────────────────────────────────────────────────── */
+window._bridgeFirebaseSignIn = _bridgeFirebaseSignIn;
 async function _bridgeFirebaseSignIn() {
   let auth = null;
   for (let i = 0; i < 100; i++) {
