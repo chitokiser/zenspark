@@ -609,5 +609,23 @@
   });
 </script>
 
+<!-- ===== JUMP 1:1 SUPPORT CHAT ===== -->
+<script type="module">
+  import { initializeApp, getApps } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
+  import { getAuth }      from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
+  import { getFirestore } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
+  const cfg = {
+    apiKey:            'AIzaSyD6oGXWcQIAa46ZiO6E9fBWOXqiNCAL4-c',
+    authDomain:        'jumper-b15aa.firebaseapp.com',
+    projectId:         'jumper-b15aa',
+    storageBucket:     'jumper-b15aa.firebasestorage.app',
+    messagingSenderId: '1051842479371',
+    appId:             '1:1051842479371:web:cd0dca2c1eab0e44b58e0e',
+  };
+  const app = getApps().length ? getApps()[0] : initializeApp(cfg);
+  window.__jumpChat = { db: getFirestore(app), auth: getAuth(app) };
+</script>
+<script type="module" src="https://jump22.netlify.app/assets/js/support-chat-embed.js"></script>
+
 </body>
 </html>
