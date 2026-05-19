@@ -61,6 +61,7 @@ const TRANSLATIONS = {
     svc_festival:    'Yen Tu Zen Festival',
     svc_festival_desc:'"Awaken Together" — 연간 선 명상·문화 축제.',
     svc_coming_soon: '준비 중',
+    svc_inquiry:     '문의하기',
     svc_visit:       '바로가기 →',
 
     /* About - 4 Pillars */
@@ -204,6 +205,7 @@ const TRANSLATIONS = {
     svc_festival:    'Yen Tu Zen Festival',
     svc_festival_desc:'"Awaken Together" — annual Zen meditation & culture festival.',
     svc_coming_soon: 'Coming Soon',
+    svc_inquiry:     'Enquire',
     svc_visit:       'Visit →',
 
     /* About - 4 Pillars */

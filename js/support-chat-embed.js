@@ -188,15 +188,21 @@ async function init() {
 
     const chatRef = doc(db, "support_chats", user.uid);
     const snap = await getDoc(chatRef);
+    const zsUser = window.Auth?.getUser?.();
+    const displayName = user.displayName || zsUser?.name || "";
+    const email = user.email || zsUser?.email || "";
     if (!snap.exists()) {
       await setDoc(chatRef, {
         uid: user.uid,
-        displayName: user.displayName || "",
-        email: user.email || "",
+        displayName,
+        email,
         lastMessage: "",
         lastAt: serverTimestamp(),
         hasUnread: false,
+        source: "zenspark",
       });
+    } else if (!snap.data().displayName && displayName) {
+      await updateDoc(chatRef, { displayName, email });
     }
 
     _unsubMsgs?.(); _unsubMsgs = null;
