@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="옌뜨에서 나를 만나다 — 선(禪), 자연, 그리고 나를 찾는 6박 7일 선불교 수행여행">
+  <title>6박 7일 템플스테이 — Zen Spark Gallery</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Noto+Serif+KR:wght@300;400;500&family=Noto+Sans+KR:wght@300;400;500&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="icon" type="image/png" href="images/logo/fabicon.png">
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
+
+  <style>
+    /* ===== Day itinerary rows ===== */
+    .day-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2rem;
+      align-items: center;
+      margin-bottom: var(--spacing-lg);
+    }
+    .day-row--last { margin-bottom: var(--spacing-xl); }
+    .day-row__media { border-radius: var(--radius-md); overflow: hidden; aspect-ratio: 16/10; }
+    .day-row__media--right { order: 2; }
+    .day-row__text--left   { order: 1; }
+    .day-row h3 { font-size: clamp(1.2rem, 4vw, 1.5rem); }
+
+    /* ===== Responsive table ===== */
+    .responsive-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; min-width: 520px; }
+    .responsive-table th, .responsive-table td { padding: 0.75rem 1rem; text-align: left; }
+
+    @media (max-width: 768px) {
+      .day-row { grid-template-columns: 1fr; gap: 1rem; margin-bottom: var(--spacing-md); }
+      .day-row--last { margin-bottom: var(--spacing-lg); }
+      .day-row__media--right, .day-row__text--left { order: 0; }
+
+      .hero-media { min-height: 48vh; }
+      .hero-media .container { padding-bottom: 1.75rem; }
+
+      .dharma-card, .closing-cta { padding: 2rem 1.25rem; }
+      .closing-cta__actions { flex-direction: column; align-items: stretch; }
+      .closing-cta__actions .btn { width: 100%; text-align: center; }
+
+      .responsive-table { min-width: 0; }
+      .responsive-table thead { display: none; }
+      .responsive-table, .responsive-table tbody, .responsive-table tr, .responsive-table td { display: block; width: 100%; }
+      .responsive-table tr { border: 1px solid var(--gray-6); border-radius: var(--radius-md); margin-bottom: 0.75rem; padding: 0.25rem 0; }
+      .responsive-table tr:last-child { margin-bottom: 0; }
+      .responsive-table td { border-bottom: none !important; padding: 0.4rem 1rem; }
+      .responsive-table td::before {
+        content: attr(data-label);
+        display: block;
+        font-size: 0.65rem;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--gold);
+        margin-bottom: 0.15rem;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .closing-cta { padding: 1.5rem 1rem; }
+    }
+  </style>
+</head>
+<body>
+
+<div id="page-overlay"></div>
+<div id="scroll-progress"></div>
+
+<!-- HEADER -->
+<header id="site-header">
+  <div class="container">
+    <div class="header-inner">
+      <a href="index.html" class="header-logo">
+        <img src="images/logo/logo.png"    class="header-logo__img header-logo__img--light" alt="Zen Spark Gallery">
+        <img src="images/logo/fabicon.png" class="header-logo__img header-logo__img--dark"  alt="Zen Spark Gallery">
+      </a>
+      <nav class="header-nav">
+        <a href="index.html#about"  data-i18n="nav_intro">소개</a>
+        <a href="community.html"    data-i18n="nav_community">커뮤니티</a>
+        <a href="services.html" class="active" data-i18n="nav_services">서비스</a>
+      </nav>
+      <div class="header-actions">
+        <div class="lang-toggle">
+          <button class="lang-btn" data-lang="vi">VI</button>
+          <button class="lang-btn" data-lang="en">EN</button>
+          <button class="lang-btn" data-lang="ko">KR</button>
+        </div>
+        <button id="header-login-btn" class="header-login-btn" data-i18n="btn_login">로그인</button>
+        <div id="header-user-menu" class="user-menu" style="display:none;">
+          <div id="header-avatar" class="user-menu__avatar"></div>
+          <div class="user-menu__dropdown">
+            <span id="header-username" style="display:block;padding:0.6rem 1.25rem;font-size:0.72rem;color:var(--gray-4);border-bottom:1px solid var(--gray-6);"></span>
+            <a href="https://jump22.netlify.app/mypage" target="_blank" data-i18n="btn_mypage">마이페이지</a>
+            <div class="divider"></div>
+            <button id="header-logout-btn" class="logout-btn" data-i18n="btn_logout">로그아웃</button>
+          </div>
+        </div>
+        <button id="hamburger" class="hamburger" aria-label="Menu">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+    </div>
+  </div>
+</header>
+
+<nav id="mobile-nav" class="mobile-nav">
+  <a href="index.html#about"  data-i18n="nav_intro">소개</a>
+  <a href="community.html"    data-i18n="nav_community">커뮤니티</a>
+  <a href="services.html"     data-i18n="nav_services">서비스</a>
+  <div style="display:flex;gap:1rem;margin-top:2rem;">
+    <button class="lang-btn" data-lang="vi" style="font-size:0.85rem;padding:0.4rem 1rem;border:1px solid var(--gray-5);border-radius:20px;">VI</button>
+    <button class="lang-btn" data-lang="en" style="font-size:0.85rem;padding:0.4rem 1rem;border:1px solid var(--gray-5);border-radius:20px;">EN</button>
+    <button class="lang-btn" data-lang="ko" style="font-size:0.85rem;padding:0.4rem 1rem;border:1px solid var(--gray-5);border-radius:20px;">KR</button>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero-media" style="position:relative;min-height:62vh;display:flex;align-items:flex-end;overflow:hidden;background:#0a0a0a;">
+  <img src="images/yentu/67/슬라이드1.PNG" alt="옌뜨에서 나를 만나다"
+       style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0.9;" loading="eager" />
+  <div style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(10,10,10,0.15) 0%,rgba(10,10,10,0.55) 65%,rgba(10,10,10,0.92) 100%);"></div>
+  <div class="container" style="position:relative;padding-bottom:3rem;">
+    <a href="services.html" style="display:inline-block;font-size:0.72rem;color:rgba(250,250,248,0.55);text-decoration:none;margin-bottom:1.25rem;">← 서비스</a>
+    <span class="label" style="display:block;color:var(--gold);">집중 수련 · 6박 7일</span>
+    <h1 style="font-family:var(--ff-display);font-weight:300;font-size:clamp(2rem,4.5vw,3.4rem);color:#fafaf8;margin:0.5rem 0;">옌뜨에서 나를 만나다</h1>
+    <p style="color:rgba(250,250,248,0.65);font-size:1rem;">선(禪), 자연, 그리고 나를 찾는 7일</p>
+  </div>
+</section>
+
+<!-- SERVICES DETAIL -->
+<section class="section">
+  <div class="container" style="max-width:920px;">
+
+    <!-- 빈 찻잔 -->
+    <div class="fade-in" style="text-align:center;margin-bottom:var(--spacing-xl);">
+      <span class="label">PROLOGUE</span>
+      <h2 style="margin-bottom:1rem;">빈 찻잔</h2>
+      <p style="color:var(--gray-3);max-width:600px;margin:0 auto 1.5rem;line-height:1.8;">
+        가득 찬 잔에는 아무것도 담을 수 없습니다. 오늘, 무엇을 비울 것인가?<br>
+        일상의 스트레스와 복잡한 생각으로 가득 찬 마음을 안고 출발합니다.
+        이 여정의 첫 번째 단계는 새로운 것을 채우는 것이 아니라, 오직 비워내는 것입니다.
+      </p>
+    </div>
+
+    <span class="gold-rule gold-rule--center gold-rule--lg fade-in" style="margin-bottom:var(--spacing-xl);"></span>
+
+    <!-- 두 개의 길 -->
+    <div class="fade-in" style="margin-bottom:var(--spacing-xl);">
+      <div class="section-header" style="text-align:left;margin-bottom:1.5rem;">
+        <span class="label">TWO PATHS, ONE DESTINATION</span>
+        <h2>두 개의 길, 하나의 목적지</h2>
+        <p style="color:var(--gray-3);">이 여정은 베트남 선불교의 발상지를 직접 걸으며, 우리에게 익숙한 한국 간화선의 본질을 함께 비춰보는 입체적인 수행의 시간입니다.</p>
+      </div>
+      <div style="overflow-x:auto;">
+        <table class="responsive-table">
+          <thead>
+            <tr style="border-bottom:2px solid var(--gray-6);">
+              <th style="color:var(--gray-4);font-weight:600;">항목</th>
+              <th style="color:var(--black);font-weight:600;">베트남 죽림선종 (Trúc Lâm)</th>
+              <th style="color:var(--black);font-weight:600;">한국 간화선 (조계종 전통)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr style="border-bottom:1px solid var(--gray-6);">
+              <td data-label="항목" style="color:var(--gray-4);">핵심</td>
+              <td data-label="베트남 죽림선종" style="color:var(--gray-2);">망상을 알아차리고 따라가지 않음</td>
+              <td data-label="한국 간화선" style="color:var(--gray-2);">화두 하나를 끝까지 의심함</td>
+            </tr>
+            <tr style="border-bottom:1px solid var(--gray-6);">
+              <td data-label="항목" style="color:var(--gray-4);">수행 대상</td>
+              <td data-label="베트남 죽림선종" style="color:var(--gray-2);">일어나는 모든 생각</td>
+              <td data-label="한국 간화선" style="color:var(--gray-2);">하나의 화두</td>
+            </tr>
+            <tr style="border-bottom:1px solid var(--gray-6);">
+              <td data-label="항목" style="color:var(--gray-4);">방법</td>
+              <td data-label="베트남 죽림선종" style="color:var(--gray-2);">관찰과 놓아버림 (하늘의 구름을 보듯)</td>
+              <td data-label="한국 간화선" style="color:var(--gray-2);">화두에 몰입 (태양 하나만 보듯)</td>
+            </tr>
+            <tr style="border-bottom:1px solid var(--gray-6);">
+              <td data-label="항목" style="color:var(--gray-4);">목표</td>
+              <td data-label="베트남 죽림선종" style="color:var(--gray-2);">본래 마음을 드러냄</td>
+              <td data-label="한국 간화선" style="color:var(--gray-2);">깨달음 (견성)</td>
+            </tr>
+            <tr>
+              <td data-label="항목" style="color:var(--gray-4);">대표 표현</td>
+              <td data-label="베트남 죽림선종" style="color:var(--gray-2);">"망상을 따라가지 말라."</td>
+              <td data-label="한국 간화선" style="color:var(--gray-2);">"이뭣고?" "무(無)!"</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <p style="text-align:center;margin-top:1.25rem;font-size:0.85rem;color:var(--gray-3);font-style:italic;">길은 다르지만, 분별을 내려놓고 본래 마음을 찾는다는 도착지는 같습니다.</p>
+    </div>
+
+    <span class="gold-rule gold-rule--center gold-rule--lg fade-in" style="margin-bottom:var(--spacing-xl);"></span>
+
+    <!-- 여정의 고도 -->
+    <div class="fade-in" style="margin-bottom:var(--spacing-xl);">
+      <div class="section-header" style="text-align:left;margin-bottom:1.5rem;">
+        <span class="label">7 DAYS ITINERARY</span>
+        <h2>여정의 고도, 마음의 깊이</h2>
+        <p style="color:var(--gray-3);">숲에서 시작해 산 정상을 거쳐 넓은 바다로 이어지는 7일간의 심리적 고도 변화.</p>
+      </div>
+      <div style="display:flex;flex-wrap:wrap;gap:0.5rem;justify-content:center;margin-bottom:0.5rem;">
+        <span style="font-size:0.7rem;color:var(--gray-4);border:1px solid var(--gray-6);border-radius:20px;padding:0.35rem 0.9rem;">Day 1 · 하노이 도착</span>
+        <span style="font-size:0.7rem;color:var(--gray-4);border:1px solid var(--gray-6);border-radius:20px;padding:0.35rem 0.9rem;">Day 2 · 옌뜨 숲속</span>
+        <span style="font-size:0.7rem;color:var(--black);border:1px solid var(--gold);background:rgba(201,168,76,0.08);border-radius:20px;padding:0.35rem 0.9rem;">Day 3 · 동사 정상</span>
+        <span style="font-size:0.7rem;color:var(--gray-4);border:1px solid var(--gray-6);border-radius:20px;padding:0.35rem 0.9rem;">Day 4 · 바방사</span>
+        <span style="font-size:0.7rem;color:var(--gray-4);border:1px solid var(--gray-6);border-radius:20px;padding:0.35rem 0.9rem;">Day 5 · 하롱베이</span>
+        <span style="font-size:0.7rem;color:var(--gray-4);border:1px solid var(--gray-6);border-radius:20px;padding:0.35rem 0.9rem;">Day 6-7 · 하노이 귀환</span>
+      </div>
+    </div>
+
+    <!-- Day 1-2 -->
+    <div class="fade-in day-row">
+      <div class="day-row__media">
+        <img src="images/yentu/67/슬라이드7.PNG" alt="Day 1-2 옌뜨 침묵 속으로" data-lightbox="temple-detail" loading="lazy" style="width:100%;height:100%;object-fit:cover;cursor:zoom-in;" />
+      </div>
+      <div>
+        <div style="font-size:0.68rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--gold);margin-bottom:0.5rem;">Day 1-2 · 옌뜨</div>
+        <h3 style="font-family:var(--ff-display);font-weight:400;font-size:1.5rem;margin:0 0 0.75rem;">침묵 속으로 걸어 들어가다</h3>
+        <ul style="list-style:none;padding:0;margin:0 0 1rem;display:flex;flex-direction:column;gap:0.5rem;font-size:0.85rem;color:var(--gray-2);">
+          <li><strong>저녁 수행</strong> — 호흡명상과 침묵의 시작. 외부의 소음을 끊습니다.</li>
+          <li><strong>새벽 명상</strong> — 안개 낀 숲속 걷기명상. 자연과 보폭을 맞춥니다.</li>
+          <li><strong>죽림선종 입문</strong> — '망상을 따라가지 않는 수행'에 대한 첫 법문.</li>
+        </ul>
+        <p style="font-size:0.8rem;color:var(--gray-4);font-style:italic;">오늘의 화두 — "수행은 새로운 것을 얻는 게 아니라… 지금 내 마음은 어디를 향하고 있는가?"</p>
+      </div>
+    </div>
+
+    <!-- Day 3 -->
+    <div class="fade-in day-row">
+      <div class="day-row__media day-row__media--right">
+        <img src="images/yentu/67/슬라이드8.PNG" alt="Day 3 옌뜨 정상 순례" data-lightbox="temple-detail" loading="lazy" style="width:100%;height:100%;object-fit:cover;cursor:zoom-in;" />
+      </div>
+      <div class="day-row__text--left">
+        <div style="font-size:0.68rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--gold);margin-bottom:0.5rem;">Day 3 · 옌뜨 정상 순례</div>
+        <h3 style="font-family:var(--ff-display);font-weight:400;font-size:1.5rem;margin:0 0 0.75rem;">구름 위의 깨달음</h3>
+        <ul style="list-style:none;padding:0;margin:0 0 1rem;display:flex;flex-direction:column;gap:0.5rem;font-size:0.85rem;color:var(--gray-2);">
+          <li><strong>하부</strong> — 케이블카 탑승 및 순례길 걷기 시작.</li>
+          <li><strong>중간</strong> — Hoa Yên Pagoda & Một Mái Pagoda 참배.</li>
+          <li><strong>정상</strong> — Đồng Pagoda(동사). 해발 1,068m에서의 산상 차명상과 침묵 수행.</li>
+        </ul>
+        <p style="font-size:0.8rem;color:var(--gray-4);font-style:italic;">육체적 오르막은 마음의 짐을 덜어내는 과정입니다. 정상에서 마시는 한 잔의 차는 가장 완벽한 '현재'를 선사합니다. (오늘의 화두: 잃어버린 소)</p>
+      </div>
+    </div>
+
+    <!-- Day 4 -->
+    <div class="fade-in day-row">
+      <div class="day-row__media">
+        <img src="images/yentu/67/슬라이드9.PNG" alt="Day 4 바방사" data-lightbox="temple-detail" loading="lazy" style="width:100%;height:100%;object-fit:cover;cursor:zoom-in;" />
+      </div>
+      <div>
+        <div style="font-size:0.68rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--gold);margin-bottom:0.5rem;">Day 4 · 바방사</div>
+        <h3 style="font-family:var(--ff-display);font-weight:400;font-size:1.5rem;margin:0 0 0.75rem;">거대한 공간, 흔들리지 않는 내면</h3>
+        <ul style="list-style:none;padding:0;margin:0 0 1rem;display:flex;flex-direction:column;gap:0.5rem;font-size:0.85rem;color:var(--gray-2);">
+          <li><strong>대웅전 참배</strong> — 웅장한 현대 사찰 건축미와 시각적 압도감.</li>
+          <li><strong>오후 좌선</strong> — 거대한 공간 속에서 오히려 작아지는 자아를 발견하는 시간.</li>
+          <li><strong>비교종교학적 시선</strong> — 베트남 대승불교와 한국 불교의 예불 문화 탐구.</li>
+        </ul>
+        <p style="font-size:0.8rem;color:var(--gray-4);font-style:italic;">오늘의 화두 — "부처를 만나면 부처를 죽여라"</p>
+      </div>
+    </div>
+
+    <!-- Day 5 -->
+    <div class="fade-in day-row">
+      <div class="day-row__media day-row__media--right">
+        <img src="images/yentu/67/슬라이드10.PNG" alt="Day 5 하롱베이" data-lightbox="temple-detail" loading="lazy" style="width:100%;height:100%;object-fit:cover;cursor:zoom-in;" />
+      </div>
+      <div class="day-row__text--left">
+        <div style="font-size:0.68rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--gold);margin-bottom:0.5rem;">Day 5 · 하롱베이</div>
+        <h3 style="font-family:var(--ff-display);font-weight:400;font-size:1.5rem;margin:0 0 0.75rem;">경계 없는 마음으로</h3>
+        <ul style="list-style:none;padding:0;margin:0 0 1rem;display:flex;flex-direction:column;gap:0.5rem;font-size:0.85rem;color:var(--gray-2);">
+          <li><strong>바다 호흡명상</strong> — 갑판 위에서 바닷바람과 함께하는 명상. 산(집중)에서 바다(확장)로 의식을 넓힙니다.</li>
+          <li><strong>물 위의 행선</strong> — 고요한 크루즈 위에서의 걷기 명상.</li>
+          <li><strong>선셋 명상</strong> — 노을이 지는 절경을 바라보며, 아름다움에 집착 없이 온전히 경험합니다.</li>
+        </ul>
+        <p style="font-size:0.8rem;color:var(--gray-4);font-style:italic;">오늘의 화두 — "나는 무엇으로 가득 차 있는가? 이뭣고? 오늘 하루만 살아라"</p>
+      </div>
+    </div>
+
+    <!-- Day 6-7 -->
+    <div class="fade-in day-row day-row--last">
+      <div class="day-row__media">
+        <img src="images/yentu/67/슬라이드11.PNG" alt="Day 6-7 회향과 귀환" data-lightbox="temple-detail" loading="lazy" style="width:100%;height:100%;object-fit:cover;cursor:zoom-in;" />
+      </div>
+      <div>
+        <div style="font-size:0.68rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--gold);margin-bottom:0.5rem;">Day 6-7 · 회향(廻向)과 귀환</div>
+        <h3 style="font-family:var(--ff-display);font-weight:400;font-size:1.5rem;margin:0 0 0.75rem;">일상이 수행이 되는 기적</h3>
+        <ul style="list-style:none;padding:0;margin:0 0 1rem;display:flex;flex-direction:column;gap:0.5rem;font-size:0.85rem;color:var(--gray-2);">
+          <li><strong>명상 특강</strong> — 스트레스 다루기, 화를 내려놓는 법, 복잡한 직장 속에서 중심 잡기.</li>
+          <li><strong>문화 체험</strong> — 베트남 전통 연꽃차와 향 만들기, 선차 예절을 통한 감각 깨우기.</li>
+          <li><strong>촛불 법회 & 수료식</strong> — 7일간의 여정을 나누고, 일상으로 돌아갈 준비를 마칩니다.</li>
+        </ul>
+        <p style="font-size:0.8rem;color:var(--gray-4);font-style:italic;">산속의 평온을 도시의 소음 속으로 가져가는 방법. 참된 수행은 일상에서 완성됩니다.</p>
+      </div>
+    </div>
+
+    <span class="gold-rule gold-rule--center gold-rule--lg fade-in" style="margin-bottom:var(--spacing-xl);"></span>
+
+    <!-- 구도자의 도구 -->
+    <div class="fade-in" style="margin-bottom:var(--spacing-xl);">
+      <div class="section-header" style="text-align:left;margin-bottom:1.5rem;">
+        <span class="label">PILGRIM'S KIT</span>
+        <h2>구도자의 도구 — 수행 키트 언박싱</h2>
+        <p style="color:var(--gray-3);">도착과 함께 제공되며, 여정을 마친 후에는 당신만의 일상 수행 지침서가 됩니다.</p>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:0.75rem 2rem;font-size:0.85rem;color:var(--gray-2);">
+        <div>1. 친환경 에코백</div>
+        <div>2. 수행 스카프</div>
+        <div>3. 나무 염주</div>
+        <div>4. A6 Dharma Card 세트 (7장)</div>
+        <div>5. 옌뜨 순례 지도</div>
+        <div>6. 프로그램 일정표</div>
+        <div>7. 명상 일기장 (무지 노트)</div>
+        <div>8. 고급 필기 볼펜</div>
+        <div>9. 필기용 노트</div>
+      </div>
+    </div>
+
+    <!-- Dharma Card -->
+    <div class="fade-in dharma-card" style="background:var(--black);border-radius:var(--radius-md);padding:2.5rem;color:#fafaf8;margin-bottom:var(--spacing-lg);">
+      <div style="font-size:0.68rem;letter-spacing:0.2em;text-transform:uppercase;color:rgba(201,168,76,0.7);margin-bottom:0.5rem;">매일 주어지는 하나의 나침반</div>
+      <h3 style="font-family:var(--ff-display);font-weight:400;font-size:1.4rem;margin:0 0 1rem;color:#fafaf8;">Dharma Card (법문 번역 카드) 시스템</h3>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:1.5rem;font-size:0.82rem;line-height:1.8;color:rgba(250,250,248,0.7);">
+        <div>
+          <strong style="color:#fafaf8;">주제</strong>: 죽은 고양이 머리에도 값이 있다<br>
+          <strong style="color:#fafaf8;">베트남 원문 & 한국어 번역</strong>: 세상에는 쓸모없는 것이 없다. 문제는 가치를 보는 눈이다.
+        </div>
+        <div>
+          <strong style="color:#fafaf8;">오늘의 핵심</strong>: 가치 판단 내려놓기<br>
+          <strong style="color:#fafaf8;">오늘의 수행</strong>: 저녁 10분 카드 읽고 명상하기<br>
+          <strong style="color:#fafaf8;">오늘의 화두</strong>: "나는 스스로를 얼마나 소중히 여기고 있는가?"
+        </div>
+      </div>
+    </div>
+
+    <!-- 최종 아티팩트 -->
+    <div class="fade-in" style="margin-bottom:var(--spacing-xl);">
+      <div class="section-header" style="text-align:left;margin-bottom:1.5rem;">
+        <span class="label">FINAL ARTIFACT</span>
+        <h2>흩어진 깨달음을 엮다 — 《옌뜨 선 수행 노트》</h2>
+        <p style="color:var(--gray-3);">매일 밤 명상 일기와 함께 완성한 7장의 카드는, 귀국하는 날 당신만의 고유한 수행 지침서가 됩니다.</p>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1rem;align-items:center;">
+        <img src="images/yentu/67/슬라이드14.PNG" alt="옌뜨 선 수행 노트" data-lightbox="temple-detail" loading="lazy" style="width:100%;border-radius:var(--radius-md);cursor:zoom-in;" />
+      </div>
+      <ul style="list-style:none;padding:0;margin:1.25rem 0 0;display:flex;flex-wrap:wrap;gap:0.5rem 2rem;font-size:0.83rem;color:var(--gray-3);">
+        <li>✦ 7일간의 법문과 화두</li>
+        <li>✦ 당신이 직접 기록한 명상 일지</li>
+        <li>✦ 수행법 요약 및 참가 인증서</li>
+      </ul>
+    </div>
+
+    <span class="gold-rule gold-rule--center gold-rule--lg fade-in" style="margin-bottom:var(--spacing-xl);"></span>
+
+    <!-- 갤러리 -->
+    <div class="fade-in" style="margin-bottom:var(--spacing-xl);">
+      <div class="section-header" style="text-align:left;margin-bottom:1.5rem;">
+        <span class="label">GALLERY</span>
+        <h2>숙소 · 주변 환경 · 수행 현장</h2>
+        <p style="color:var(--gray-3);">죽림선원 인근의 숙소와 자연, 함께한 이들의 수행 순간들.</p>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:1rem;">
+        <figure style="margin:0;">
+          <img src="images/yentu/67/슬라이드15.PNG" alt="숙소" data-lightbox="temple-gallery" loading="lazy" style="width:100%;border-radius:var(--radius-md);cursor:zoom-in;aspect-ratio:4/3;object-fit:cover;" />
+          <figcaption style="font-size:0.75rem;color:var(--gray-4);margin-top:0.5rem;text-align:center;">숙소</figcaption>
+        </figure>
+        <figure style="margin:0;">
+          <img src="images/yentu/67/슬라이드16.PNG" alt="주변 환경" data-lightbox="temple-gallery" loading="lazy" style="width:100%;border-radius:var(--radius-md);cursor:zoom-in;aspect-ratio:4/3;object-fit:cover;" />
+          <figcaption style="font-size:0.75rem;color:var(--gray-4);margin-top:0.5rem;text-align:center;">주변 환경</figcaption>
+        </figure>
+        <figure style="margin:0;">
+          <img src="images/yentu/67/슬라이드17.PNG" alt="수행" data-lightbox="temple-gallery" loading="lazy" style="width:100%;border-radius:var(--radius-md);cursor:zoom-in;aspect-ratio:4/3;object-fit:cover;" />
+          <figcaption style="font-size:0.75rem;color:var(--gray-4);margin-top:0.5rem;text-align:center;">수행</figcaption>
+        </figure>
+        <figure style="margin:0;">
+          <img src="images/yentu/67/슬라이드18.PNG" alt="옌뜨 오르가닉팜" data-lightbox="temple-gallery" loading="lazy" style="width:100%;border-radius:var(--radius-md);cursor:zoom-in;aspect-ratio:4/3;object-fit:cover;" />
+          <figcaption style="font-size:0.75rem;color:var(--gray-4);margin-top:0.5rem;text-align:center;">옌뜨 오르가닉팜</figcaption>
+        </figure>
+      </div>
+    </div>
+
+    <!-- CLOSING CTA -->
+    <div class="fade-in closing-cta" style="background:var(--black);border-radius:var(--radius-md);padding:4rem 2rem;text-align:center;position:relative;overflow:hidden;">
+      <div style="position:absolute;inset:0;background:radial-gradient(ellipse 60% 70% at 50% 50%,rgba(201,168,76,0.1) 0%,transparent 70%);pointer-events:none;"></div>
+      <p style="font-size:0.7rem;letter-spacing:0.28em;text-transform:uppercase;color:var(--gold);margin-bottom:1rem;">EPILOGUE</p>
+      <h2 style="font-family:var(--ff-display);font-size:clamp(1.5rem,3vw,2.2rem);font-weight:300;color:#fafaf8;margin-bottom:1rem;line-height:1.5;">
+        "나는 지금 무엇을<br>따라가고 있는가?"
+      </h2>
+      <p style="color:rgba(250,250,248,0.55);margin-bottom:2rem;font-size:0.9rem;">옌뜨에서 시작될 당신의 대답을 기다립니다.</p>
+      <div class="closing-cta__actions" style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;">
+        <button type="button" class="btn btn--gold" onclick="document.getElementById('__jc-btn')?.click()">예약 문의 →</button>
+        <a href="services.html" class="btn btn--outline">← 전체 서비스 보기</a>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer id="site-footer">
+  <div class="container">
+    <div class="footer-inner">
+      <div class="footer-brand">
+        <img src="images/logo/fabicon.png" alt="Zen Spark Gallery" class="footer-logo__img">
+        <p>선불교(禪)의 정신을 바탕으로 예술, 체험, 커머스가 하나로 어우러지는 공간입니다.</p>
+        <span class="footer-tagline" data-i18n="footer_tagline">A space for awakening, art, and mindful living</span>
+      </div>
+      <div class="footer-col">
+        <h5 data-i18n="footer_links">바로가기</h5>
+        <ul>
+          <li><a href="index.html" data-i18n="nav_intro">소개</a></li>
+          <li><a href="community.html" data-i18n="nav_community">커뮤니티</a></li>
+          <li><a href="services.html" data-i18n="nav_services">서비스</a></li>
+          <li><a href="https://jump22.netlify.app/mypage" target="_blank" data-i18n="btn_mypage">마이페이지</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h5 data-i18n="footer_contact">연락처</h5>
+        <ul>
+          <li><a href="mailto:info@zenspark.gallery">info@zenspark.gallery</a></li>
+          <li><a href="https://tracer543.wixsite.com/my-site" target="_blank">Wix Blog</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p data-i18n="footer_copy">© 2024 Zen Spark Gallery. All rights reserved.</p>
+      <div class="lang-toggle">
+        <button class="lang-btn active" data-lang="ko">KR</button>
+        <button class="lang-btn"        data-lang="en">EN</button>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<button id="back-to-top" aria-label="Back to top">↑</button>
+<div id="toast-container"></div>
+
+<!-- LOGIN MODAL -->
+<div id="login-modal" class="modal-overlay">
+  <div class="modal">
+    <button id="modal-close-btn" class="modal__close" aria-label="Close">✕</button>
+    <h2 class="modal__title">로그인</h2>
+    <p class="modal__subtitle">Google 계정으로 로그인하세요.</p>
+    <span class="gold-rule"></span>
+    <button id="google-login-btn" class="login-btn login-btn--google">
+      <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+        <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+        <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+        <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
+        <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+      </svg>
+      <span>Google로 계속하기</span>
+    </button>
+  </div>
+</div>
+
+<script src="js/language.js"></script>
+<script src="js/config.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/header.js"></script>
+<script src="js/lightbox.js"></script>
+<script src="js/main.js"></script>
+
+<!-- ===== JUMP 1:1 SUPPORT CHAT ===== -->
+<script type="module">
+  import { initializeApp, getApps } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
+  import { getAuth }      from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
+  import { getFirestore } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
+  const cfg = {
+    apiKey:            'AIzaSyD6oGXWcQIAa46ZiO6E9fBWOXqiNCAL4-c',
+    authDomain:        'jumper-b15aa.firebaseapp.com',
+    projectId:         'jumper-b15aa',
+    storageBucket:     'jumper-b15aa.firebasestorage.app',
+    messagingSenderId: '1051842479371',
+    appId:             '1:1051842479371:web:cd0dca2c1eab0e44b58e0e',
+  };
+  const app = getApps().length ? getApps()[0] : initializeApp(cfg);
+  window.__jumpChat = { db: getFirestore(app), auth: getAuth(app) };
+</script>
+<script type="module" src="js/support-chat-embed.js"></script>
+</body>
+</html>

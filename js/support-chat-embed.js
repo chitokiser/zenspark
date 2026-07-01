@@ -1,6 +1,9 @@
 // js/support-chat-embed.js — 로컬 복사본 (CORS 우회)
 // 사전 조건: window.__jumpChat = { db: Firestore인스턴스, auth: Auth인스턴스 }
 
+// 1:1 채팅 기능 보류 — 재개하려면 true로 변경
+const CHAT_ENABLED = false;
+
 import {
   collection, doc, addDoc, onSnapshot, orderBy, query,
   serverTimestamp, setDoc, updateDoc, getDoc,
@@ -116,6 +119,8 @@ let _unsubMsgs = null;
 let _unreadRefs = [];
 
 async function init() {
+  if (!CHAT_ENABLED) return;
+
   let cfg = null;
   for (let i = 0; i < 100; i++) {
     if (window.__jumpChat?.db && window.__jumpChat?.auth) { cfg = window.__jumpChat; break; }
