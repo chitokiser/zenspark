@@ -9,7 +9,7 @@ const ADMIN_EMAILS = ['daguri75@gmail.com'];          // Google 로그인 email
 /* ── Google OAuth Client ID ──
    Google Cloud Console > APIs & Services > Credentials > OAuth 2.0 Client ID (Web)
    Authorized JavaScript origins에 http://127.0.0.1:5500 추가 필요 */
-const GOOGLE_CLIENT_ID = '';
+const GOOGLE_CLIENT_ID = '1051842479371-nqu92nllovrtq93420a0lq8qptvve8r4.apps.googleusercontent.com';
 
 const Auth = (() => {
   let user = null;
@@ -240,44 +240,9 @@ const Auth = (() => {
     const closeBtn = document.getElementById('modal-close-btn');
     if (closeBtn) closeBtn.addEventListener('click', closeLoginModal);
 
-    /* Google login btn */
+    /* Google login btn → direct Google OAuth */
     const googleBtn = document.getElementById('google-login-btn');
     if (googleBtn) googleBtn.addEventListener('click', loginWithGoogle);
-
-    /* Jump popup btn (원클릭 로그인) */
-    const jumpPopupBtn = document.getElementById('jump-popup-btn');
-    if (jumpPopupBtn) jumpPopupBtn.addEventListener('click', loginWithJumpPopup);
-
-    /* Jump 직접 입력 토글 */
-    const jumpToggle = document.getElementById('jump-manual-toggle');
-    const jumpForm   = document.getElementById('jump-login-form');
-    if (jumpToggle && jumpForm) {
-      jumpToggle.addEventListener('click', () => {
-        const hidden = jumpForm.style.display === 'none';
-        jumpForm.style.display = hidden ? '' : 'none';
-        jumpToggle.textContent = hidden ? '직접 입력 닫기' : '아이디/비밀번호로 직접 입력';
-      });
-    }
-
-    /* Jump login form (직접 입력 폼 제출) */
-    if (jumpForm) {
-      jumpForm.addEventListener('submit', async e => {
-        e.preventDefault();
-        const id  = document.getElementById('jump-id').value.trim();
-        const pw  = document.getElementById('jump-pw').value;
-        if (!id || !pw) return;
-        const btn = jumpForm.querySelector('[type=submit]');
-        const originalHTML = btn.innerHTML;
-        btn.disabled = true;
-        btn.innerHTML = '<span>···</span>';
-        try {
-          await loginWithJump(id, pw);
-        } finally {
-          btn.disabled = false;
-          btn.innerHTML = originalHTML;
-        }
-      });
-    }
 
     /* Header login btn */
     const loginTrigger = document.getElementById('header-login-btn');
